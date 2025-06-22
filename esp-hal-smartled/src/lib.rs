@@ -327,12 +327,20 @@ impl<Tx: TxChannelAsync, const BUFFER_SIZE: usize> SmartLedsWriteAsync
         I: Into<Self::Color>,
     {
         self.prepare_rmt_buffer(iterator)?;
-        for chunk in self.rmt_buffer.chunks(RMT_RAM_ONE_LED + 1) {
-            self.channel
-                .transmit(chunk)
-                .await
-                .map_err(LedAdapterError::TransmissionError)?;
+
+        let mut chunks = self.rmt_buffer.chunks(RMT_RAM_ONE_LED + 1);
+        if chunks.len() == 0 {
+            return Ok(());
         }
+        let mut future = self.channel.transmit(chunks.next().unwrap());
+
+        for next_chunk in chunks {
+            future.await.map_err(LedAdapterError::TransmissionError)?;
+            future = self.channel.transmit(next_chunk);
+        }
+
+        future.await.map_err(LedAdapterError::TransmissionError)?;
+
         Ok(())
     }
 }
