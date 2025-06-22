@@ -27,11 +27,7 @@ use embassy_time::{Duration, Timer};
 use esp_backtrace as _;
 use esp_hal::{rmt::Rmt, time::Rate, timer::timg::TimerGroup, Config};
 use esp_hal_smartled::{buffer_size_async, SmartLedsAdapterAsync};
-use smart_leds::{
-    brightness, gamma,
-    hsv::{hsv2rgb, Hsv},
-    SmartLedsWriteAsync, RGB8,
-};
+use smart_leds::{colors, SmartLedsWriteAsync};
 
 #[esp_hal_embassy::main]
 async fn main(_spawner: Spawner) -> ! {
@@ -57,14 +53,16 @@ async fn main(_spawner: Spawner) -> ! {
     .expect("Failed to initialize RMT")
     .into_async();
 
+    const NUM_LEDS: usize = 2;
+
     // We use one of the RMT channels to instantiate a `SmartLedsAdapterAsync` which can
     // be used directly with all `smart_led` implementations
     let rmt_channel = rmt.channel0;
-    let rmt_buffer = [0_u32; buffer_size_async(1)];
+    let rmt_buffer = [0_u32; buffer_size_async(NUM_LEDS)];
 
     // Each devkit uses a unique GPIO for the RGB LED, so in order to support
     // all chips we must unfortunately use `#[cfg]`s:
-    let mut led: SmartLedsAdapterAsync<_, 25> = {
+    let mut led = {
         cfg_if::cfg_if! {
             if #[cfg(feature = "esp32")] {
                 SmartLedsAdapterAsync::new(rmt_channel, p.GPIO33, rmt_buffer)
@@ -81,27 +79,9 @@ async fn main(_spawner: Spawner) -> ! {
         }
     };
 
-    let mut color = Hsv {
-        hue: 0,
-        sat: 255,
-        val: 255,
-    };
-    let mut data: RGB8;
-    let level = 10;
-
     loop {
-        for hue in 0..=255 {
-            color.hue = hue;
-            // Convert from the HSV color space (where we can easily transition from one
-            // color to the other) to the RGB color space that we can then send to the LED
-            data = hsv2rgb(color);
-            // When sending to the LED, we do a gamma correction first (see smart_leds
-            // documentation for details) and then limit the brightness to 10 out of 255 so
-            // that the output is not too bright.
-            led.write(brightness(gamma([data].into_iter()), level))
-                .await
-                .unwrap();
-            Timer::after(Duration::from_millis(10)).await;
-        }
+        let data = [colors::RED, colors::GREEN];
+        led.write(data.into_iter()).await.unwrap();
+        Timer::after(Duration::from_millis(10)).await;
     }
 }
