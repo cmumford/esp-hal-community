@@ -71,7 +71,8 @@ async fn main(_spawner: Spawner) -> ! {
             } else if #[cfg(feature = "esp32c3")] {
                 SmartLedsAdapterAsync::new(rmt_channel, p.GPIO2, rmt_buffer)
             } else if #[cfg(any(feature = "esp32c6", feature = "esp32h2"))] {
-                SmartLedsAdapterAsync::new(rmt_channel, p.GPIO8, rmt_buffer)
+                // hardcoded for the Waveshare ESP32-C6-LCD-1.9 development board.
+                SmartLedsAdapterAsync::new(rmt_channel, p.GPIO3, rmt_buffer)
             } else if #[cfg(feature = "esp32s2")] {
                 SmartLedsAdapterAsync::new(rmt_channel, p.GPIO18, rmt_buffer)
             } else if #[cfg(feature = "esp32s3")] {

@@ -8,6 +8,6 @@
     "esp-hal-smartled/Cargo.toml"
   ],
   // helps remove rust-analyser errors due to requiring a feature flag and target
-  "rust-analyzer.cargo.features": ["esp32c3"], 
-  "rust-analyzer.cargo.target": "riscv32imc-unknown-none-elf",
+  "rust-analyzer.cargo.features": ["esp32c6"],
+  "rust-analyzer.cargo.target": "riscv32imac-unknown-none-elf",
 }
