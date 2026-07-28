@@ -206,6 +206,9 @@ impl<'ch, const BUFFER_SIZE: usize> SmartLedsAdapter<'ch, BUFFER_SIZE, Grb<u8>> 
     }
 }
 
+// TODO: Remove `#[allow(deprecated)]` after `rgb` is bumped to 0.9 which allows
+// migration away from ComponentSlice.
+#[allow(deprecated)]
 impl<'ch, const BUFFER_SIZE: usize, Color> SmartLedsAdapter<'ch, BUFFER_SIZE, Color>
 where
     Color: rgb::ComponentSlice<u8>,
@@ -234,6 +237,9 @@ where
     }
 }
 
+// TODO: Remove `#[allow(deprecated)]` after `rgb` is bumped to 0.9 which allows
+// migration away from ComponentSlice.
+#[allow(deprecated)]
 impl<'ch, const BUFFER_SIZE: usize, Color> SmartLedsWrite
     for SmartLedsAdapter<'ch, BUFFER_SIZE, Color>
 where
@@ -324,6 +330,9 @@ impl<'ch, const BUFFER_SIZE: usize> SmartLedsAdapterAsync<'ch, BUFFER_SIZE, Grb<
     }
 }
 
+// TODO: Remove `#[allow(deprecated)]` after `rgb` is bumped to 0.9 which allows
+// migration away from ComponentSlice.
+#[allow(deprecated)]
 impl<'ch, const BUFFER_SIZE: usize, Color> SmartLedsAdapterAsync<'ch, BUFFER_SIZE, Color>
 where
     Color: rgb::ComponentSlice<u8>,
@@ -381,6 +390,9 @@ where
     }
 }
 
+// TODO: Remove `#[allow(deprecated)]` after `rgb` is bumped to 0.9 which allows
+// migration away from ComponentSlice.
+#[allow(deprecated)]
 impl<'ch, const BUFFER_SIZE: usize, Color> SmartLedsWriteAsync
     for SmartLedsAdapterAsync<'ch, BUFFER_SIZE, Color>
 where
