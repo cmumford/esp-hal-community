@@ -80,7 +80,7 @@ jobs:
         with:
           components: rust-src, clippy
           target: riscv32imac-unknown-none-elf
-      - run: cargo +stable clippy --features "esp32c6,esp-hal/unstable" --target=riscv32imac-unknown-none-elf -- -D warnings
+      - run: cargo +stable clippy --features "esp32c6" --target=riscv32imac-unknown-none-elf -- -D warnings
 
   fmt:
     name: Check formatting
@@ -112,7 +112,7 @@ jobs:
         with:
           components: rust-src
           targets: "riscv32imac-unknown-none-elf"
-      - run: cargo build -p esp-hal-smartled --features "esp32c6,esp-hal/unstable" --target=riscv32imac-unknown-none-elf
+      - run: cargo build -p esp-hal-smartled --features "esp32c6" --target=riscv32imac-unknown-none-elf
 
   msrv-buzzer:
     name: MSRV esp-hal-buzzer
@@ -123,4 +123,4 @@ jobs:
         with:
           components: rust-src
           targets: "riscv32imac-unknown-none-elf"
-      - run: cargo build -p esp-hal-buzzer --features "esp32c6,esp-hal/unstable" --target=riscv32imac-unknown-none-elf
+      - run: cargo build -p esp-hal-buzzer --features "esp32c6" --target=riscv32imac-unknown-none-elf

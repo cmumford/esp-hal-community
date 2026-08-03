@@ -19,10 +19,10 @@ runs:
     - if: ${{ startsWith(inputs.target, 'riscv') }}
       shell: bash
       run: |
-        cargo check -p ${{ inputs.package}} --features="${{ inputs.soc }},esp-hal/unstable" --target=${{ inputs.target }} --examples
+        cargo check -p ${{ inputs.package}} --features="${{ inputs.soc }}" --target=${{ inputs.target }} --examples
 
     # Build the package (Xtensa):
     - if: ${{ startsWith(inputs.target, 'xtensa') }}
       shell: bash
       run: |
-        cargo check -Zbuild-std=core -p ${{ inputs.package }} --features="${{ inputs.soc }},esp-hal/unstable" --target=${{ inputs.target }} --examples
+        cargo check -Zbuild-std=core -p ${{ inputs.package }} --features="${{ inputs.soc }}" --target=${{ inputs.target }} --examples
