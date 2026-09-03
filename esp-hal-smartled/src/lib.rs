@@ -78,9 +78,9 @@ pub enum LedAdapterError {
     TransmissionError(RmtError),
 }
 
-impl From<RmtError> for LedAdapterError {
-    fn from(e: RmtError) -> Self {
-        LedAdapterError::TransmissionError(e)
+impl From<(RmtError, Channel<'_, Blocking, Tx>)> for LedAdapterError {
+    fn from(e: (RmtError, Channel<'_, Blocking, Tx>)) -> Self {
+        LedAdapterError::TransmissionError(e.0)
     }
 }
 
@@ -220,7 +220,8 @@ where
         O: PeripheralOutput<'ch>,
         C: TxChannelCreator<'ch, Blocking>,
     {
-        let channel = channel.configure_tx(pin, led_config()).unwrap();
+        let config = led_config();
+        let channel = channel.configure_tx(&config).unwrap().with_pin(pin);
 
         // Assume the RMT peripheral is set up to use the APB clock
         let src_clock = Clocks::get().apb_clock.as_mhz();
@@ -338,7 +339,8 @@ where
         O: PeripheralOutput<'ch>,
         C: TxChannelCreator<'ch, Async>,
     {
-        let channel = channel.configure_tx(pin, led_config()).unwrap();
+        let config = led_config();
+        let channel = channel.configure_tx(&config).unwrap().with_pin(pin);
 
         // Assume the RMT peripheral is set up to use the APB clock
         let src_clock = Clocks::get().apb_clock.as_mhz();
