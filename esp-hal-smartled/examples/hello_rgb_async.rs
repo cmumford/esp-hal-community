@@ -38,18 +38,8 @@ esp_bootloader_esp_idf::esp_app_desc!();
 async fn main(_spawner: Spawner) -> ! {
     // Initialize the HAL Peripherals
     let p = esp_hal::init(Config::default());
-    #[cfg(target_arch = "riscv32")]
-    {
-        let timg0 = TimerGroup::new(p.TIMG0);
-        let sw_interrupt =
-            esp_hal::interrupt::software::SoftwareInterruptControl::new(p.SW_INTERRUPT);
-        esp_rtos::start(timg0.timer0, sw_interrupt.software_interrupt0);
-    }
-    #[cfg(target_arch = "xtensa")]
-    {
-        let timg0 = TimerGroup::new(p.TIMG0);
-        esp_rtos::start(timg0.timer0);
-    }
+    let timg0 = TimerGroup::new(p.TIMG0);
+    esp_rtos::start(timg0.timer0, p.FROM_CPU_INTR0);
 
     // Configure RMT (Remote Control Transceiver) peripheral globally
     // <https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/peripherals/rmt.html>

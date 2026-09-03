@@ -49,9 +49,10 @@ use core::{fmt::Debug, marker::PhantomData, slice::IterMut};
 
 use esp_hal::{
     Async, Blocking,
-    clock::Clocks,
+    clock,
     gpio::{Level, interconnect::PeripheralOutput},
     rmt::{Channel, Error as RmtError, PulseCode, Tx, TxChannelConfig, TxChannelCreator},
+    time::Rate,
 };
 use rgb::Grb;
 use smart_leds_trait::{SmartLedsWrite, SmartLedsWriteAsync};
@@ -84,19 +85,20 @@ impl From<(RmtError, Channel<'_, Blocking, Tx>)> for LedAdapterError {
     }
 }
 
-fn led_pulses_for_clock(src_clock: u32) -> (PulseCode, PulseCode) {
+fn led_pulses_for_clock(src_clock: Rate) -> (PulseCode, PulseCode) {
+    let src_clock_mhz = src_clock.as_mhz();
     (
         PulseCode::new(
             Level::High,
-            ((SK68XX_T0H_NS * src_clock) / 1000) as u16,
+            ((SK68XX_T0H_NS * src_clock_mhz) / 1000) as u16,
             Level::Low,
-            ((SK68XX_T0L_NS * src_clock) / 1000) as u16,
+            ((SK68XX_T0L_NS * src_clock_mhz) / 1000) as u16,
         ),
         PulseCode::new(
             Level::High,
-            ((SK68XX_T1H_NS * src_clock) / 1000) as u16,
+            ((SK68XX_T1H_NS * src_clock_mhz) / 1000) as u16,
             Level::Low,
-            ((SK68XX_T1L_NS * src_clock) / 1000) as u16,
+            ((SK68XX_T1L_NS * src_clock_mhz) / 1000) as u16,
         ),
     )
 }
@@ -224,7 +226,7 @@ where
         let channel = channel.configure_tx(&config).unwrap().with_pin(pin);
 
         // Assume the RMT peripheral is set up to use the APB clock
-        let src_clock = Clocks::get().apb_clock.as_mhz();
+        let src_clock = Rate::from_hz(clock::ll::apb_clk_frequency());
 
         Self {
             channel: Some(channel),
@@ -343,7 +345,7 @@ where
         let channel = channel.configure_tx(&config).unwrap().with_pin(pin);
 
         // Assume the RMT peripheral is set up to use the APB clock
-        let src_clock = Clocks::get().apb_clock.as_mhz();
+        let src_clock = Rate::from_hz(clock::ll::apb_clk_frequency());
 
         Self {
             channel,
